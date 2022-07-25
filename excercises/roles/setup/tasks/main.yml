@@ -1,0 +1,45 @@
+---
+- name: update apt packages
+  become: true
+  yum:
+    update_cache: yes
+
+- name: upgrade packages
+  become: true
+  yum:
+    name: '*'
+    state: latest
+
+- name: Install nodejs stable release setup for CentOS
+  shell: 'curl -sL https://rpm.nodesource.com/setup_14.x | sudo -E bash -'
+
+- name: install nodejs and npm
+  become: true
+  yum:
+    name: nodejs
+    state: latest
+    update_cache: yes
+
+- name: install pm2
+  become: true
+  npm:
+    name: pm2
+    global: true
+    production: true
+
+- name: create ~/web directory
+  become: true
+  file:
+    path: ~/web
+    state: directory
+    mode: 0755
+
+- name: copy server code file
+  become: true
+  copy:
+    src: index.js
+    dest: ~/web
+    backup: yes
+
+- name: install pm2
+  shell: pm2 start ~/web/index.js -f
