@@ -20,7 +20,6 @@ jobs:
   configure_infrastructure:
     docker:
       - image: python:3.8-alpine3.15
-    working_directory: ./exercises
     steps:
     - checkout
     - add_ssh_keys:
@@ -30,7 +29,9 @@ jobs:
         command: apk add --update ansible
     - run:
         name: Run playbook and configure server
-        command: ansible-playbook -i inventory.txt main-remote.yml
+        command: |
+          cd exercises
+          ansible-playbook -i inventory.txt main-remote.yml
 
 workflows:
   my_workflow:
