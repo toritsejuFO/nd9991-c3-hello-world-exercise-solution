@@ -13,7 +13,7 @@ jobs:
             aws cloudformation deploy \
               --stack-name ${CIRCLE_WORKFLOW_ID:0:7}-stack \
               --template-file exercises/ec2.yml \
-              --parameter-overrides file://$(pwd)exercises/ec2-params.json \
+              --parameter-overrides file://$(pwd)/exercises/ec2-params.json \
               --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
               --region us-east-1
 
