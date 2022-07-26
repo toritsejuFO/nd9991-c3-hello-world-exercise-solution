@@ -19,7 +19,7 @@ jobs:
 
   configure_infrastructure:
     docker:
-      - image: python:3.8.9-alpine3.15
+      - image: python:3.8-alpine3.15
     working_directory: ./exercises
     steps:
     - checkout
@@ -27,7 +27,7 @@ jobs:
         fingerprints: [57:e4:e8:c3:d0:0b:18:b9:75:58:ed:dc:87:fa:18:fe]
     - run:
         name: Install Ansible
-        command: pip3 install ansible --upgrade --user
+        command: apk add --update ansible
     - run:
         name: Run playbook and configure server
         command: ansible-playbook -i inventory.txt main-remote.yml
