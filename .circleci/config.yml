@@ -30,9 +30,9 @@ jobs:
       - run:
           name: Install ssh
           command: |
-              apk add --update openssh-client bash
+              apk add --update openssh-client
               eval $(ssh-agent -s)
-              bash -c 'ssh-add <(echo "$SSH_PRIVATE_KEY")'
+              ssh-add <(echo "$SSH_PRIVATE_KEY")
       - run:
           name: Run playbook and configure server
           command: |
