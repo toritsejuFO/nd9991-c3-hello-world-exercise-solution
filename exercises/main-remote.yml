@@ -1,7 +1,7 @@
 ---
 - name: Exercise for setting up a web server in an EC2 instance
   hosts: all
-  user: ec2-user
+  user: ubuntu
   become: true
   become_method: sudo
   become_user: root
