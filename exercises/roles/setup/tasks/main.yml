@@ -1,22 +1,23 @@
 ---
 - name: update apt packages
   become: true
-  yum:
+  apt:
     update_cache: yes
 
 - name: upgrade packages
   become: true
-  yum:
-    name: '*'
-    state: latest
+  apt:
+    upgrade: yes
 
-- name: Install nodejs stable release setup for CentOS
-  shell: 'curl -sL https://rpm.nodesource.com/setup_14.x | sudo -E bash -'
+- name:
+  become: true
+  apt:
+    autoremove: yes
 
 - name: install nodejs and npm
   become: true
-  yum:
-    name: nodejs
+  apt:
+    name: [nodejs]
     state: latest
     update_cache: yes
 
