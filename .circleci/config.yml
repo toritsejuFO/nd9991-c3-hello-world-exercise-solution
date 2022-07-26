@@ -5,8 +5,8 @@ commands:
     steps:
       - run:
           name: Delete infrastructure stack
-          command: aws cloudformation delete-stack --stack-name ${CIRCLE_WORKFLOW_ID:0:7}-stack
           when: on_fail
+          command: aws cloudformation delete-stack --stack-name ${CIRCLE_WORKFLOW_ID:0:7}-stack
 
 jobs:
   create_infrastructure:
