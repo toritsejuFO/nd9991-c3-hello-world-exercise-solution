@@ -60,7 +60,7 @@ jobs:
 
   smoke_test_fail:
     docker:
-      - image: alpine:latest
+      - image: amazon/aws-cli
     steps:
       - run: return 1
       - destroy_environment
