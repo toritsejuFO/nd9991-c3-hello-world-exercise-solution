@@ -32,7 +32,7 @@ jobs:
           command: |
               apk add --update openssh-client
               eval $(ssh-agent -s)
-              ssh-add <(echo "$SSH_PRIVATE_KEY")
+              echo "$SSH_PRIVATE_KEY" | ssh-add -
       - run:
           name: Run playbook and configure server
           command: |
