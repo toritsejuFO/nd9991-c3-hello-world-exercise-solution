@@ -62,7 +62,8 @@ jobs:
     docker:
       - image: amazon/aws-cli
     steps:
-      - run: return 1
+      - run:
+          command: return 1
       - destroy_environment
 
 workflows:
