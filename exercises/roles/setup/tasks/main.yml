@@ -42,5 +42,5 @@
     dest: ~/web
     backup: yes
 
-- name: install pm2
+- name: start application
   shell: pm2 start ~/web/index.js -f
