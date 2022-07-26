@@ -1,9 +1,16 @@
 version: 2.1
 
+commands:
+  destroy_environment:
+    steps:
+      - run:
+          name: Delete infrastructure stack
+          command: aws cloudformation delete-stack --stack-name ${CIRCLE_WORKFLOW_ID:0:7}-stack
+
 jobs:
   create_infrastructure:
     docker:
-      - image: cimg/aws:2022.06
+      - image: amazon/aws-cli
     steps:
       - checkout
       - run: echo ${CIRCLE_WORKFLOW_ID}
@@ -50,9 +57,20 @@ jobs:
             return 1
           fi
 
+  smoke_test_fail:
+    docker:
+      - image: alpine:latest
+    steps:
+      - run: return 1
+      - destroy_environment:
+          when: on_fail
+
 workflows:
   my_workflow:
     jobs:
-      # - create_infrastructure
-      - configure_infrastructure
-      # - smoke_test
+      - create_infrastructure
+      # - configure_infrastructure
+      # - smoke_test:
+      - smoke_test_fail:
+          requires:
+            - create_infrastructure
