@@ -8,9 +8,10 @@ jobs:
       - checkout
       - run: echo ${CIRCLE_WORKFLOW_ID}
       - run:
-          command: !
+          name: Create cloudformation stack
+          command: |
             aws cloudformation deploy \
-              --stack-name ${CIRCLE_WORKFLOW_ID:0:5}-stack \
+              --stack-name ${CIRCLE_WORKFLOW_ID:0:7}-stack \
               --template-file exercises/ec2.yml \
               --parameters exercises/ec2-params.yml \
               --capabilities "CAPABILITY_IAM" "CAPABILITY_NAMED_IAM" \
