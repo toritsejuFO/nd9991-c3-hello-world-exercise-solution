@@ -28,6 +28,10 @@ jobs:
           name: Install Ansible
           command: apk add --update ansible
       - run:
+          name: Install ssh
+          command: |
+              apk add --update openssh-client
+      - run:
           name: Run playbook and configure server
           command: |
             cd exercises
@@ -50,5 +54,5 @@ workflows:
   my_workflow:
     jobs:
       # - create_infrastructure
-      # - configure_infrastructure
-      - smoke_test
+      - configure_infrastructure
+      # - smoke_test
