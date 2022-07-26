@@ -63,7 +63,7 @@ jobs:
       - image: alpine:latest
     steps:
       - run: return 1
-      - destroy_environment:
+      - destroy_environment
 
 workflows:
   my_workflow:
