@@ -76,7 +76,7 @@ jobs:
           command: |
             cd exercises
             PID=${CIRCLE_WORKFLOW_ID:0:7}
-            aws cloduforamtion deploy \
+            aws cloudforamtion deploy \
             --stack-name s3-bucket-${PID}
             --template-file cfn/bucket.yml
             --parameter-overrides MyBucketName=PID
