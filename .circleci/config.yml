@@ -77,8 +77,8 @@ jobs:
             cd exercises
             PID=${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation deploy \
-            --stack-name s3-bucket-${PID}
-            --template-file cfn/bucket.yml
+            --stack-name s3-bucket-${PID} \
+            --template-file cfn/bucket.yml \
             --parameter-overrides MyBucketName=PID
       - run: aws s3 sync . s3://s3-bucket-${PID} --delete
 
