@@ -139,7 +139,7 @@ jobs:
       - run:
           name: Fetch cloudfront distribution id and invalidate cache
           command: |
-            DISTRO_ID=$(aws --profile udacity_c3 cloudfront list-distributions \
+            DISTRO_ID=$(aws cloudfront list-distributions \
             --query "DistributionList.Items[*].{Id: Id, OriginId: Origins.Items[?Id=='webpage'].Id | [0]}[?OriginId!=None].Id" \
             --output text)
             # Invalidate cloudfront cache
