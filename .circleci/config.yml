@@ -76,7 +76,7 @@ jobs:
           command: |
             cd exercises
             PID=${CIRCLE_WORKFLOW_ID:0:7}
-            aws cloudforamtion deploy \
+            aws cloudformation deploy \
             --stack-name s3-bucket-${PID}
             --template-file cfn/bucket.yml
             --parameter-overrides MyBucketName=PID
@@ -111,7 +111,7 @@ jobs:
       - run:
           name: Fetch and save the old pipeline ID (bucket name) responsible for the last release.
           command: aws cloudformation list-exports \
-            --query "Exports[?Name=='PipelineID']".Value \
+            --query "Exports[?Name=='PipelineID'].Value" \
             --no-paginate \
             --output text > textfile.txt
       - persist_to_workspace:
