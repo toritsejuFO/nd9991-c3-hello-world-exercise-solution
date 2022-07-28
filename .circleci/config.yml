@@ -66,12 +66,104 @@ jobs:
           command: return 1
       - destroy_environment
 
+  create_and_deploy_front_end:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Execute bucket.yml - create cloudformation stack
+          command: |
+            cd exercises
+            PID=${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloduforamtion deploy \
+            --stack-name s3-bucket-${PID}
+            --template-file cfn/bucket.yml
+            --parameter-overrides MyBucketName=PID
+      - run: aws s3 sync . s3://s3-bucket-${PID} --delete
+
+  smoke_test_for_new_deployment:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Get cloudfront url
+          command: |
+            cloudfrontURL=$(aws --profile udacity_c3 cloudfront list-distributions \
+            --query "DistributionList.Items[*].{DomainName: DomainName, Id: Origins.Items[?Id=='webpage'].Id | [0]}[?Id!=None].DomainName" \
+            --output text)
+      - run:
+          name: run smoke test
+          command: |
+            if curl -s -I $cloudfrontURL
+            then
+              return 0
+            else
+              return 1
+            fi
+
+  get_last_deployment_id:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Fetch and save the old pipeline ID (bucket name) responsible for the last release.
+          command: aws cloudformation list-exports \
+            --query "Exports[?Name=='PipelineID']".Value \
+            --no-paginate \
+            --output text > textfile.txt
+      - persist_to_workspace:
+          root: /tmp/workspace
+          paths:
+            - textfile.txt
+
+  promote_to_production:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Execute cloudfront.yml
+          command: |
+            cd exercises
+            PID=${CIRCLE_WORKFLOW_ID:0:7}
+            aws --profile udacity_c3 cloudformation deploy \
+            --template-file cfn/cloudfront.yml \
+            --stack-name production-distro \
+            --parameter-overrides PipelineID=s3-bucket-${PID}
+
+  clean_up_old_front_end:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /tmp/workspace
+      - run:
+          name: Destroy previous S3
+          command: |
+            OldBucketID=$(cat textfile.txt)
+            aws s3 rm "s3://${OldBucketID}" --recursive
+
+
 workflows:
   my_workflow:
     jobs:
-      - create_infrastructure
+      # - create_infrastructure
       # - configure_infrastructure
       # - smoke_test:
-      - smoke_test_fail:
+      # - smoke_test_fail:
+      #     requires:
+      #       - create_infrastructure
+      - create_and_deploy_front_end
+      - promote_to_production:
           requires:
-            - create_infrastructure
+           - create_and_deploy_front_end
+      - get_last_deployment_id
+      - clean_up_old_front_end:
+          requires:
+            - get_last_deployment_id
+            - promote_to_production
+      # - smoke_test_for_new_deployment
