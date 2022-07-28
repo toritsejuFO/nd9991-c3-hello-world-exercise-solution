@@ -83,6 +83,7 @@ jobs:
       - run: 
           name: Sync bucket
           command: |
+            cd exercises
             PID=${CIRCLE_WORKFLOW_ID:0:7}
             aws s3 cp index.html s3://s3-bucket-${PID}/index.html --content-type "text/html"
             aws s3 cp error.html s3://s3-bucket-${PID}/error.html --content-type "text/html"
@@ -160,7 +161,7 @@ jobs:
             aws s3 rm "s3://${OldBucketID}" --recursive
             # Switch between the below after first run (REASON: first s3 bucket is created outside of pipeline)
             # aws cloudformation delete-stack --stack-name bucket-475626363636 # only uncomment if created via cloudformation an not manually
-            # aws cloudformation delete-stack --stack-name "${OldBucketID}-stack"
+            aws cloudformation delete-stack --stack-name "${OldBucketID}-stack"
 
 workflows:
   my_workflow:
