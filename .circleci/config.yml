@@ -90,11 +90,10 @@ jobs:
     docker:
       - image: amazon/aws-cli
     steps:
-      - checkout
       - run:
           name: Get cloudfront url
           command: |
-            cloudfrontURL=$(aws --profile udacity_c3 cloudfront list-distributions \
+            cloudfrontURL=$(aws cloudfront list-distributions \
             --query "DistributionList.Items[*].{DomainName: DomainName, Id: Origins.Items[?Id=='webpage'].Id | [0]}[?Id!=None].DomainName" \
             --output text)
             # run smoke test
@@ -109,12 +108,11 @@ jobs:
     docker:
       - image: amazon/aws-cli
     steps:
-      - checkout
       - run:
           name: Fetch and save the old pipeline ID (bucket name) responsible for the last release.
-          command: aws cloudformation list-exports \
+          command: |
+            aws cloudformation list-exports \
             --query "Exports[?Name=='PipelineID'].Value" \
-            --no-paginate \
             --output text > textfile.txt
       - persist_to_workspace:
           root: /tmp/workspace
