@@ -79,7 +79,7 @@ jobs:
             aws cloudformation deploy \
             --stack-name s3-bucket-${PID} \
             --template-file cfn/bucket.yml \
-            --parameter-overrides MyBucketName=${PID}
+            --parameter-overrides MyBucketName=s3-bucket-${PID}
       - run: aws s3 sync . s3://s3-bucket-${PID} --delete
 
   smoke_test_for_new_deployment:
