@@ -80,7 +80,11 @@ jobs:
             --stack-name s3-bucket-${PID} \
             --template-file cfn/bucket.yml \
             --parameter-overrides MyBucketName=s3-bucket-${PID}
-      - run: aws s3 sync . "s3://s3-bucket-${PID}" --delete
+      - run: 
+          name: Sync bucket
+          command: |
+            PID=${CIRCLE_WORKFLOW_ID:0:7}
+            aws s3 sync . s3://s3-bucket-${PID} --delete
 
   smoke_test_for_new_deployment:
     docker:
@@ -93,14 +97,12 @@ jobs:
             cloudfrontURL=$(aws --profile udacity_c3 cloudfront list-distributions \
             --query "DistributionList.Items[*].{DomainName: DomainName, Id: Origins.Items[?Id=='webpage'].Id | [0]}[?Id!=None].DomainName" \
             --output text)
-      - run:
-          name: run smoke test
-          command: |
-            if curl -s -I $cloudfrontURL
-            then
-              return 0
-            else
-              return 1
+            # run smoke test
+            if curl -s -I $cloudfrontURL \
+            then \
+              return 0 \
+            else \
+              return 1 \
             fi
 
   get_last_deployment_id:
