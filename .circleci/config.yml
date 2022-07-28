@@ -84,7 +84,8 @@ jobs:
           name: Sync bucket
           command: |
             PID=${CIRCLE_WORKFLOW_ID:0:7}
-            aws s3 sync . s3://s3-bucket-${PID} --delete
+            aws s3 cp index.html s3://s3-bucket-${PID}/index.html --content-type "text/html"
+            aws s3 cp error.html s3://s3-bucket-${PID}/error.html --content-type "text/html"
 
   smoke_test_for_new_deployment:
     docker:
