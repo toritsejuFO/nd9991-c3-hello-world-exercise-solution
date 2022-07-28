@@ -110,12 +110,13 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - run: yum install -y tar gzip
+      - run: mkdir -p /tmp/workspace
       - run:
           name: Fetch and save the old pipeline ID (bucket name) responsible for the last release.
           command: |
             aws cloudformation list-exports \
             --query "Exports[?Name=='PipelineID'].Value" \
-            --output text > textfile.txt
+            --output text > /tmp/workspace/textfile.txt
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
@@ -131,7 +132,7 @@ jobs:
           command: |
             cd exercises
             PID=${CIRCLE_WORKFLOW_ID:0:7}
-            aws --profile udacity_c3 cloudformation deploy \
+            aws cloudformation deploy \
             --template-file cfn/cloudfront.yml \
             --stack-name production-distro \
             --parameter-overrides PipelineID=s3-bucket-${PID}
@@ -146,9 +147,8 @@ jobs:
       - run:
           name: Destroy previous S3
           command: |
-            OldBucketID=$(cat textfile.txt)
+            OldBucketID=$(cat /tmp/workspace/textfile.txt)
             aws s3 rm "s3://${OldBucketID}" --recursive
-
 
 workflows:
   my_workflow:
