@@ -1,6 +1,6 @@
 Parameters:
   # Existing Bucket name
-  PipelineID:
+  BucketName:
     Description: Existing Bucket name
     Type: String
 
@@ -16,7 +16,7 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-          - DomainName: !Sub "${PipelineID}.s3.amazonaws.com"
+          - DomainName: !Sub "${BucketName}.s3.amazonaws.com"
             Id: webpage
             S3OriginConfig:
               OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
@@ -29,7 +29,7 @@ Resources:
           ViewerProtocolPolicy: allow-all
 
 Outputs:
-  PipelineID:
-    Value: !Sub ${PipelineID}
+  BucketName:
+    Value: !Sub ${BucketName}
     Export:
-      Name: PipelineID
+      Name: BucketName

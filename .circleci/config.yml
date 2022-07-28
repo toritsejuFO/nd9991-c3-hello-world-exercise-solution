@@ -77,7 +77,7 @@ jobs:
             cd exercises
             PID=${CIRCLE_WORKFLOW_ID:0:7}
             aws cloudformation deploy \
-            --stack-name s3-bucket-${PID} \
+            --stack-name s3-bucket-${PID}-stack \
             --template-file cfn/bucket.yml \
             --parameter-overrides MyBucketName=s3-bucket-${PID}
       - run: 
@@ -112,15 +112,15 @@ jobs:
       - run: yum install -y tar gzip
       - run: mkdir -p /tmp/workspace
       - run:
-          name: Fetch and save the old pipeline ID (bucket name) responsible for the last release.
+          name: Fetch and save the old bucket name responsible for the last release.
           command: |
             aws cloudformation list-exports \
-            --query "Exports[?Name=='PipelineID'].Value" \
-            --output text > /tmp/workspace/textfile.txt
+            --query "Exports[?Name=='BucketName'].Value" \
+            --output text > /tmp/workspace/old-bucket-name.txt
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
-            - textfile.txt
+            - old-bucket-name.txt
 
   promote_to_production:
     docker:
@@ -135,7 +135,15 @@ jobs:
             aws cloudformation deploy \
             --template-file cfn/cloudfront.yml \
             --stack-name production-distro \
-            --parameter-overrides PipelineID=s3-bucket-${PID}
+            --parameter-overrides BucketName=s3-bucket-${PID}
+      - run:
+          name: Fetch cloudfront distribution id and invalidate cache
+          command: |
+            DISTRO_ID=$(aws --profile udacity_c3 cloudfront list-distributions \
+            --query "DistributionList.Items[*].{Id: Id, OriginId: Origins.Items[?Id=='webpage'].Id | [0]}[?OriginId!=None].Id" \
+            --output text)
+            # Invalidate cloudfront cache
+            aws cloudfront create-invalidation --distribution-id ${DISTRO_ID} --paths "/index.html"
 
   clean_up_old_front_end:
     docker:
@@ -148,8 +156,11 @@ jobs:
       - run:
           name: Destroy previous S3
           command: |
-            OldBucketID=$(cat /tmp/workspace/textfile.txt)
+            OldBucketID=$(cat /tmp/workspace/old-bucket-name.txt)
             aws s3 rm "s3://${OldBucketID}" --recursive
+            # Switch between the below after first run (REASON: first s3 bucket is created outside of pipeline)
+            # aws cloudformation delete-stack --stack-name bucket-475626363636 # only uncomment if created via cloudformation an not manually
+            # aws cloudformation delete-stack --stack-name "${OldBucketID}-stack"
 
 workflows:
   my_workflow:
