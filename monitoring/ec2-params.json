@@ -1,0 +1,18 @@
+[
+  {
+    "ParameterKey": "Environment",
+    "ParameterValue": "UdacityProjectC3"
+  },
+  {
+    "ParameterKey": "VPC",
+    "ParameterValue": "vpc-0e474ec0220c66a56"
+  },
+  {
+    "ParameterKey": "AmazonAmiId",
+    "ParameterValue": "ami-0cff7528ff583bf9a"
+  },
+  {
+    "ParameterKey": "UbuntuAmiId",
+    "ParameterValue": "ami-052efd3df9dad4825"
+  }
+]

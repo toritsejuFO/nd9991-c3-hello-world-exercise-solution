@@ -1,0 +1,46 @@
+Description: Create an ec2 instance
+
+Parameters:
+  Environment:
+    Type: String
+  VPC:
+    Type: String
+  AmazonAmiId:
+    Type: String
+  UbuntuAmiId:
+    Type: String
+
+Resources:
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: !Ref VPC
+      GroupDescription: Security Group for standalone ec2 instance
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9090
+          ToPort: 9090
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9093
+          ToPort: 9093
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 9100
+          ToPort: 9100
+          CidrIp: 0.0.0.0/0
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref UbuntuAmiId
+      KeyName: course3_kp
+      InstanceType: t2.micro
+      SecurityGroupIds: [!Ref InstanceSecurityGroup]
+      Tags:
+        - Key: Name
+          Value: !Sub ${Environment}-Instance
